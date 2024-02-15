@@ -1,0 +1,13 @@
+﻿.float-action-button{
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+.home-content{
+    padding: 50px;
+    width: 100%;
+    height: 100%;
+}
+
+

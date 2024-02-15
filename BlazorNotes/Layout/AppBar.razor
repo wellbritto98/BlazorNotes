@@ -1,14 +1,21 @@
-﻿<header class="app-bar">
+﻿@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+
+<header class="app-bar">
     <nav>
         <span>
-            <button class="btn btn-light">BlazorNotes</button>
+            <ButtonComponent @onclick="GoToHomePage">BlazorNotes</ButtonComponent>
         </span>
         <span>
-            <button class="btn btn-light">Read ME</button>
+            <ButtonComponent>ReadME</ButtonComponent>
         </span>
     </nav>
 </header>
 
 @code {
+
+    public void GoToHomePage(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo("/");
+    }
 
 }

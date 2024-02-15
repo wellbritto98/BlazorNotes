@@ -1,0 +1,89 @@
+﻿.container-card {
+    width: 304px;
+    height: auto;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px;
+}
+
+.content,
+.headline-and-subhead {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.content-card {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.headline-and-subhead {
+    gap: 4px;
+}
+
+.headline,
+.subhead,
+.content-text {
+    color: black;
+    font-size: 20px;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 500;
+    word-wrap: break-word;
+}
+
+.subhead {
+    color: #3C3C43;
+    font-size: 18px;
+    font-weight: 400;
+}
+
+.content-text {
+    color: #666666;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.buttons {
+    display: inline-flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.tag {
+    padding: 8px 12px;
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 10px;
+}
+
+.tag-outline {
+    border: 1px #3C3C43 solid;
+}
+
+.tag-filled {
+    background: #3C3C43;
+    border: 1px #3C3C43 solid;
+}
+
+.tag-or-button {
+    color: #3C3C43;
+    font-size: 14px;
+    font-family: 'Source Code Pro', monospace;
+    font-weight: 400;
+    word-wrap: break-word;
+}
+
+.tag-filled .tag-or-button {
+    color: white;
+}

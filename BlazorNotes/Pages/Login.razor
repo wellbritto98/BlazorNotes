@@ -1,0 +1,56 @@
+﻿@page "/login"
+@using System.ComponentModel.DataAnnotations
+
+
+<PageTitle>BlazorNotes</PageTitle>
+<div class="login-page">
+<div class="login-content">
+
+    <form Model="@model" class="form-login">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <label for="email-input">
+            Email:</label>
+        <InputTextCustom @bind-Value="@model.Email" id="email-input"> </InputTextCustom>
+    
+        <label for="senha-input">
+            Senha:</label>
+        <InputTextCustom type="password" @bind-Value="@model.Password" id="senha-input"> </InputTextCustom>
+    
+    
+        <ButtonComponent>Sign In</ButtonComponent>
+    </form>
+    
+    <div class="login-links">
+        <a @onclick="OpenRegisterModal">Register</a>
+        </div>
+</div>
+
+</div>
+@inject IModalService ModalService
+@code
+{
+    private LoginModel model = new LoginModel();
+
+    public void SubmitForm()
+    {
+        Console.WriteLine("Form submitted");
+    }
+    
+
+    
+    public void OpenRegisterModal()
+    {
+
+        ModalService.Show<RegisterModal>("Register");
+    }
+
+    public class LoginModel
+    {
+        [Required]
+        public string? Email { get; set; }
+        [Required]
+        [DataType(DataType.Password)]
+        public string? Password { get; set; }
+    }
+}

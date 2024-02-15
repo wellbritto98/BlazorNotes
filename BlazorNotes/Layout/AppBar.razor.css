@@ -1,5 +1,5 @@
 ﻿.app-bar{
-    background-color: #2196F3;
+    background-color: #1a2e53;
     color: white;
     padding: 10px;
     display: flex;
@@ -8,6 +8,9 @@
     font-size: 20px;
     font-weight: bold;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    height: 80px;
+    position: sticky;
+    width: 100%;
 }
 
 .app-bar nav{
