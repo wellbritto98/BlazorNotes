@@ -19,32 +19,6 @@ admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
 
-exports.login = functions.https.onRequest((req, res) => {
-  var email = req.body.email;
-  var password = req.body.password;
-
-  app
-    .auth()
-    .signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      // User is authenticated
-      const user = userCredential.user;
-      const token = user.getIdToken();
-      const userId = user.uid;
-      console.log(`User ${user.email} is authenticated`);
-      res.status(200).send({
-        success: true,
-        message: `User ${user.email} is authenticated`,
-        data: { token: token, userId: userId },
-      });
-    })
-    .catch((error) => {
-      // Authentication failed
-      console.error("Authentication failed:", error);
-      res.status(400).send({ error: "Authentication failed" });
-    });
-});
-
 exports.register = functions.https.onRequest((req, res) => {
   var email = req.body.email;
   var password = req.body.password;

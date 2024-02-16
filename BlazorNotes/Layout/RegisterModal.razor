@@ -1,7 +1,8 @@
 ﻿@page "/RegisterModal"
 @using System.ComponentModel.DataAnnotations
+@inject IJSRuntime JSRuntime
 
-<form class="form-register" Model="@model">
+<div class="form-register" Model="@model">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <label for="email-input">
@@ -16,16 +17,27 @@
         Confirmar Senha:</label>
     <InputTextCustom type="password" @bind-Value="@model.ConfirmPassword" id="confirm-senha-input"> </InputTextCustom>
 
-    <ButtonComponent>Register</ButtonComponent>
-</form>
+    <ButtonComponent @onclick="SubmitForm">Register</ButtonComponent>
+</div>
 
 @code
 {
     private RegisterModel model = new RegisterModel();
 
-    public void SubmitForm()
+    public async Task SubmitForm()
     {
-        Console.WriteLine("Form submitted");
+        var result = await JSRuntime.InvokeAsync<object>("signUp", model.Email, model.Password);
+
+        if (result is not null && result.GetType().GetProperty("success")?.GetValue(result, null) is bool success && success)
+        {
+            //disparar um alerta de sucesso
+            Console.WriteLine("Success");
+        }
+        else
+        {
+            var errorMessage = result?.GetType().GetProperty("mensagem")?.GetValue(result, null)?.ToString();
+            Console.WriteLine($"Failed to sign up: {errorMessage}");
+        }
     }
 
     public class RegisterModel

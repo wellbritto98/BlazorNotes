@@ -1,12 +1,15 @@
 ﻿@page "/login"
 @using System.ComponentModel.DataAnnotations
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
 
 
 <PageTitle>BlazorNotes</PageTitle>
 <div class="login-page">
 <div class="login-content">
 
-    <form Model="@model" class="form-login">
+    <div Model="@model" class="form-login">
         <DataAnnotationsValidator />
         <ValidationSummary />
         <label for="email-input">
@@ -18,8 +21,8 @@
         <InputTextCustom type="password" @bind-Value="@model.Password" id="senha-input"> </InputTextCustom>
     
     
-        <ButtonComponent>Sign In</ButtonComponent>
-    </form>
+        <ButtonComponent @onclick="SubmitForm">Sign In</ButtonComponent>
+    </div>
     
     <div class="login-links">
         <a @onclick="OpenRegisterModal">Register</a>
@@ -32,10 +35,20 @@
 {
     private LoginModel model = new LoginModel();
 
-    public void SubmitForm()
+public async Task SubmitForm()
+{
+    var result = await JSRuntime.InvokeAsync<bool>("signIn", model.Email, model.Password);
+
+    if (result)
     {
-        Console.WriteLine("Form submitted");
+        toastService.ShowSuccess("Logado com sucesso !");
+        NavigationManager.NavigateTo("/");
     }
+    else
+    {
+        Console.WriteLine($"Failed to sign in");
+    }
+}
     
 
     
