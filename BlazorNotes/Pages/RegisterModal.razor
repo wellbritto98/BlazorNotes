@@ -2,9 +2,10 @@
 @using System.ComponentModel.DataAnnotations
 @inject IJSRuntime JSRuntime
 
-<div class="form-register" Model="@model">
+<EditForm  Model="@model">
     <DataAnnotationsValidator />
     <ValidationSummary />
+    <div class="form-register">
     <label for="email-input">
         Email:</label>
     <InputTextCustom @bind-Value="@model.Email" id="email-input"> </InputTextCustom>
@@ -17,8 +18,9 @@
         Confirmar Senha:</label>
     <InputTextCustom type="password" @bind-Value="@model.ConfirmPassword" id="confirm-senha-input"> </InputTextCustom>
 
-    <ButtonComponent @onclick="SubmitForm">Register</ButtonComponent>
-</div>
+    <ButtonComponent @onclick="SubmitForm">Registrar</ButtonComponent>
+    </div>
+</EditForm>
 
 @code
 {

@@ -1,4 +1,7 @@
-﻿@inject Microsoft.AspNetCore.Components.NavigationManager NavigationManager
+﻿@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+
 
 <header class="app-bar">
     <nav>
@@ -6,7 +9,7 @@
             <ButtonComponent @onclick="GoToHomePage">BlazorNotes</ButtonComponent>
         </span>
         <span>
-            <ButtonComponent>ReadME</ButtonComponent>
+            <ButtonComponent @onclick="SignOut">Sair</ButtonComponent>
         </span>
     </nav>
 </header>
@@ -16,6 +19,21 @@
     public void GoToHomePage(MouseEventArgs e)
     {
         NavigationManager.NavigateTo("/");
+    }
+
+    public async Task SignOut(MouseEventArgs e)
+    {
+        bool signOut = await JSRuntime.InvokeAsync<bool>("signOut");
+        if (signOut)
+        {
+            toastService.ShowSuccess("Deslogado com sucesso !");
+            NavigationManager.NavigateTo("/login");
+        }
+        else
+        {
+            toastService.ShowError("Erro ao deslogar !");
+        }
+
     }
 
 }

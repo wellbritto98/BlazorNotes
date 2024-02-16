@@ -15,7 +15,7 @@
     display: flex;
     flex-direction: column;
     gap: 20px;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
     box-shadow: 4px 8px 15px 0 rgba(0, 0, 0, 0.2);
 }
@@ -29,13 +29,11 @@
 }
 
 
-
-
-div.form-login {
+.form-login {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
+    align-items: flex-start;
+    justify-content: flex-start;
     gap: 20px;
 }
 

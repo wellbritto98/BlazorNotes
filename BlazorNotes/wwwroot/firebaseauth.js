@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
 
 const firebaseConfig = {
@@ -15,26 +15,26 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 // Função de login
-window.signIn = async function(email, password) {
-    console.log('Iniciado')
+window.signIn = async function (email, password) {
+    console.log('Iniciado');
     const auth = getAuth();
     try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        // Se o login for bem-sucedido, armazena o usuário no localStorage (já está fazendo) e retorna true
-        const user = userCredential.user;
-        var localStorage = window.localStorage;
-        localStorage.setItem('user', JSON.stringify(user));
-        return true;
-    } catch (error) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error(`Erro no login: ${errorCode}, ${errorMessage}`);
+        // Configura a persistência antes de fazer o login
+        await setPersistence(auth, browserLocalPersistence);
 
-        return false;
+        // Tenta fazer o login
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log('Usuário logado com sucesso: ', userCredential.user);
+        return true; // Retorna true se o login for bem-sucedido
+    } catch (error) {
+        // Captura erros tanto de persistência quanto de login
+        console.error('Erro no login: ', error.code, error.message);
+        return false; // Retorna false se ocorrer um erro
     }
 }
 
-window.signUp = async function(email, password) {
+
+window.signUp = async function (email, password) {
     const auth = getAuth();
     return createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
@@ -42,7 +42,7 @@ window.signUp = async function(email, password) {
             var retorno = new Object();
             retorno.success = true;
             retorno.mensagem = "Usuário criado com sucesso";
-            console.log('Retorno' + retorno.success +' '+ retorno.mensagem)
+            console.log('Retorno' + retorno.success + ' ' + retorno.mensagem)
             return retorno;
         })
         .catch((error) => {
@@ -55,3 +55,34 @@ window.signUp = async function(email, password) {
             return retorno;
         });
 }
+
+window.authStateChanged = function () {
+    return new Promise((resolve, reject) => {
+        const auth = getAuth();
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('Usuário logado');
+                resolve(true);
+            } else {
+                console.log('Usuário não logado');
+                resolve(false);
+            }
+        });
+    });
+}
+
+window.signOut = async function () {
+    const auth = getAuth();
+    try {
+        await signOut(auth);
+        console.log('Usuário deslogado');
+        return true; // Retorna true se o logout for bem-sucedido
+    } catch (error) {
+        console.log('Erro ao deslogar usuário', error);
+        return false; // Retorna false em caso de erro
+    }
+};
+
+
+
+

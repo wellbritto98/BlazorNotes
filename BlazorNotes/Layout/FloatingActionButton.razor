@@ -1,15 +1,16 @@
-﻿
-
-
-    <button id="fab-add" @onclick="ShowModal" class="fab-button">
-        <i class="fas fa-plus"></i>
-    </button>
-
-
+﻿@using BlazorNotes.Pages
 @inject IModalService modalService
+
+
+<button id="fab-add" @onclick="ShowModal" class="fab-button">
+    <i class="fas fa-plus"></i>
+</button>
+
+
+
 @code {
     void ShowModal()
     {
-        modalService.Show<AddCardModal>("My Modal Title");
+        modalService.Show<AddCardModal>("Adicionar Card");
     }
 }

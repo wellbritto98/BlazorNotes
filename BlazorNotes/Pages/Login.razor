@@ -7,27 +7,33 @@
 
 <PageTitle>BlazorNotes</PageTitle>
 <div class="login-page">
-<div class="login-content">
+    <div class="login-content">
 
-    <div Model="@model" class="form-login">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-        <label for="email-input">
-            Email:</label>
-        <InputTextCustom @bind-Value="@model.Email" id="email-input"> </InputTextCustom>
-    
-        <label for="senha-input">
-            Senha:</label>
-        <InputTextCustom type="password" @bind-Value="@model.Password" id="senha-input"> </InputTextCustom>
-    
-    
-        <ButtonComponent @onclick="SubmitForm">Sign In</ButtonComponent>
-    </div>
-    
-    <div class="login-links">
-        <a @onclick="OpenRegisterModal">Register</a>
+        <EditForm Model="@model">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-login">
+
+
+                <label for="email-input">
+                    Email:
+                </label>
+                <InputTextCustom @bind-Value="@model.Email" id="email-input"> </InputTextCustom>
+
+                <label for="senha-input">
+                    Senha:
+                </label>
+                <InputTextCustom type="password" @bind-Value="@model.Password" id="senha-input"> </InputTextCustom>
+
+
+                <ButtonComponent @onclick="SubmitForm">Sign In</ButtonComponent>
+            </div>
+        </EditForm>
+
+        <div class="login-links">
+            <a @onclick="OpenRegisterModal">Register</a>
         </div>
-</div>
+    </div>
 
 </div>
 @inject IModalService ModalService
@@ -35,23 +41,35 @@
 {
     private LoginModel model = new LoginModel();
 
-public async Task SubmitForm()
-{
-    var result = await JSRuntime.InvokeAsync<bool>("signIn", model.Email, model.Password);
-
-    if (result)
+    public async Task SubmitForm()
     {
-        toastService.ShowSuccess("Logado com sucesso !");
-        NavigationManager.NavigateTo("/");
-    }
-    else
-    {
-        Console.WriteLine($"Failed to sign in");
-    }
-}
-    
+        var result = await JSRuntime.InvokeAsync<bool>("signIn", model.Email, model.Password);
 
-    
+        if (result)
+        {
+            toastService.ShowSuccess("Logado com sucesso !");
+            NavigationManager.NavigateTo("/");
+        }
+        else
+        {
+            toastService.ShowError("Usuario ou senha invalidos !");
+        }
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        bool isAuthenticated = await JSRuntime.InvokeAsync<bool>("authStateChanged");
+
+        if (isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/", true);
+        }
+
+    }
+
+
+
     public void OpenRegisterModal()
     {
 

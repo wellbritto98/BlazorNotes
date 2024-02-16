@@ -1,8 +1,25 @@
 ﻿@page "/"
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
 
 <PageTitle>BlazorNotes</PageTitle>
 <div class="home-content">
     <CardNote></CardNote>
     <FloatingActionButton/>
 </div>
+
+@code{
+    protected override async Task OnInitializedAsync()
+    {
+        bool isAuthenticated = await JSRuntime.InvokeAsync<bool>("authStateChanged");
+
+        if (!isAuthenticated)
+        {
+            toastService.ShowError("Você precisa estar logado para acessar esta página");
+            NavigationManager.NavigateTo("/login");
+        }
+
+    }
+}
 
