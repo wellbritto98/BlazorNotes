@@ -1,5 +1,8 @@
 ﻿.container-card {
     width: 304px;
+    min-width: 304px;
+    max-width: 304px;
+    flex: 1;
     height: auto;
     background: white;
     border-radius: 12px;

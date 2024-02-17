@@ -20,4 +20,8 @@
       <_ContentIncludedByDefault Remove="Components\ButtonComponent.razor" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Models\" />
+    </ItemGroup>
+
 </Project>

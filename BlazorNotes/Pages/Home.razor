@@ -1,15 +1,79 @@
 ﻿@page "/"
+@using Newtonsoft.Json
+@using System.Text.Json
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavigationManager
 @inject IToastService toastService
+@inject ILocalStorageService localStorage
+@inject HttpClient Http
 
 <PageTitle>BlazorNotes</PageTitle>
 <div class="home-content">
-    <CardNote></CardNote>
-    <FloatingActionButton/>
+    @if (noteList?.Notes != null)
+    {
+        foreach (var note in noteList.Notes)
+        {
+            <CardNote Title="@note.Title" SubTitle="@note.Subhead" Content="@note.Content" />
+        }
+    }
+    <FloatingActionButton />
 </div>
 
-@code{
+@code {
+    // Definindo noteList como uma propriedade da classe
+    public NoteList noteList { get; set; }
+
+    public class NoteList
+    {
+        public List<NoteModel> Notes { get; set; } = new List<NoteModel>(); // Inicializando para evitar NullReferenceException
+    }
+    public class NoteModel
+    {
+        public string NoteId { get; set; }
+        public string Title { get; set; }
+        public string Subhead { get; set; }
+        public string Content { get; set; }
+        public string CreateTime { get; set; }
+        public string UpdateTime { get; set; }
+    }
+
+    public class RootObject
+    {
+        [JsonProperty("documents")]
+        public List<Document> Documents { get; set; }
+    }
+    public class Document
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("fields")]
+        public Fields Fields { get; set; }
+
+        [JsonProperty("createTime")]
+        public string CreateTime { get; set; }
+
+        [JsonProperty("updateTime")]
+        public string UpdateTime { get; set; }
+    }
+
+    public class Fields
+    {
+        [JsonProperty("title")]
+        public StringValue Title { get; set; }
+
+        [JsonProperty("subhead")]
+        public StringValue Subhead { get; set; }
+
+        [JsonProperty("content")]
+        public StringValue Content { get; set; }
+    }
+
+    public class StringValue
+    {
+        [JsonProperty("stringValue")]
+        public string Value { get; set; }
+    }
+
     protected override async Task OnInitializedAsync()
     {
         bool isAuthenticated = await JSRuntime.InvokeAsync<bool>("authStateChanged");
@@ -19,6 +83,84 @@
             toastService.ShowError("Você precisa estar logado para acessar esta página");
             NavigationManager.NavigateTo("/login");
         }
+        else
+        {
+            var authKey = "firebase:authUser:AIzaSyDdrz5LgykDBpxBsRf9-C59PhJ0w1Weda0:[DEFAULT]";
+
+            // Obter o valor JSON do localStorage
+            var userDataJson = await localStorage.GetItemAsStringAsync(authKey);
+
+            // Verificar se userDataJson não é nulo ou vazio
+            if (!string.IsNullOrEmpty(userDataJson))
+            {
+                // Parsear o userDataJson para um JsonDocument
+                using var document = JsonDocument.Parse(userDataJson);
+                // Obter a raiz do documento
+                var root = document.RootElement;
+                // Tentar obter o valor do UID
+                if (root.TryGetProperty("uid", out var uidElement))
+                {
+                    var userId = uidElement.GetString();
+
+                    // Verificar se o userId não é nulo ou vazio
+                    if (!string.IsNullOrEmpty(userId))
+                    {
+                        // Restante do código para recuperar as notas...
+                        var baseUrl = "https://firestore.googleapis.com/v1";
+                        var projectId = "blazor-notes";
+                        var collectionName = "notes";
+                        var documentName = "users";
+                        var url = $"{baseUrl}/projects/{projectId}/databases/(default)/documents/{documentName}/{userId}/{collectionName}";
+
+                        var response = await Http.GetAsync(url);
+
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var responseJson = await response.Content.ReadAsStringAsync();
+                            var rootObject = JsonConvert.DeserializeObject<RootObject>(responseJson);
+                            var notes = rootObject.Documents
+                                .Select(d => new NoteModel
+                                    {
+                                        NoteId = d.Name.Split('/').Last(),
+                                        Title = d.Fields.Title.Value,
+                                        Subhead = d.Fields.Subhead.Value,
+                                        Content = d.Fields.Content.Value,
+                                        CreateTime = d.CreateTime,
+                                        UpdateTime = d.UpdateTime
+                                    })
+                                .ToList();
+
+                            noteList = new NoteList
+                                {
+                                    Notes = notes
+                                };
+
+
+                                toastService.ShowSuccess("Sucesso");
+
+
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Falha ao recuperar as notas. Status: {response.StatusCode}");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("UID do usuário não encontrado.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Não foi possível encontrar a propriedade 'uid' nos dados do usuário.");
+                }
+            }
+            else
+            {
+                Console.WriteLine("Dados do usuário não estão disponíveis no localStorage.");
+            }
+        }
+
 
     }
 }
