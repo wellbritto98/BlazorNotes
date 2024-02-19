@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using BlazorNotes;
 using Blazored.LocalStorage;
 
+
 string credentialFirebasePath = "BlazorNotes/Properties/blazor-notes-firebase-adminsdk-y20l2-de04d3d319.json";
 Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", credentialFirebasePath);
 var builder = WebAssemblyHostBuilder.CreateDefault(args);

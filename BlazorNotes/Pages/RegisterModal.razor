@@ -28,17 +28,16 @@
 
     public async Task SubmitForm()
     {
-        var result = await JSRuntime.InvokeAsync<object>("signUp", model.Email, model.Password);
+        var result = await JSRuntime.InvokeAsync<bool>("signUp", model.Email, model.Password);
 
-        if (result is not null && result.GetType().GetProperty("success")?.GetValue(result, null) is bool success && success)
+        if (result)
         {
             //disparar um alerta de sucesso
             Console.WriteLine("Success");
         }
-        else
-        {
-            var errorMessage = result?.GetType().GetProperty("mensagem")?.GetValue(result, null)?.ToString();
-            Console.WriteLine($"Failed to sign up: {errorMessage}");
+        else{
+
+            Console.WriteLine($"Failed to sign up");
         }
     }
 

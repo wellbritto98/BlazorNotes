@@ -1,4 +1,4 @@
-﻿@page "/addcardmodal"
+﻿@page "/addcardmodal/{notelist}"
 @inject IModalService modalService
 @using System.ComponentModel.DataAnnotations
 @using System.Text.Json
@@ -6,6 +6,8 @@
 @inject HttpClient Http
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject IToastService toastService
+@using Models.Home
+
 
 <EditForm Model="@model">
     <DataAnnotationsValidator />
@@ -32,7 +34,9 @@
 
 
 @code {
-    // this card is to add Notes
+
+
+
     private CardModel model = new CardModel();
     [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
     private async Task SubmitForm()
@@ -81,6 +85,24 @@
 
                     if (response.IsSuccessStatusCode)
                     {
+                        var responseJson = await response.Content.ReadAsStringAsync();
+                        var responseDocument = JsonDocument.Parse(responseJson);
+
+                        // Desserializar a resposta para obter os detalhes da nota adicionada
+                        var newNote = new NoteModel
+                            {
+                                NoteId = responseDocument.RootElement.GetProperty("name").GetString().Split('/').Last(),
+                                Title = model.Title,
+                                Subhead = model.Subhead,
+                                Content = model.Content
+                            };
+
+                        await localStorage.SetItemAsync("newNote", newNote);
+
+
+                        // Atualizar a renderização da página
+                       
+
                         toastService.ShowSuccess("Nota adicionada com sucesso.");
                         await BlazoredModal.CloseAsync();
                     }
@@ -104,6 +126,10 @@
             Console.WriteLine("Dados do usuário não estão disponíveis no localStorage.");
         }
     }
+
+
+
+
 
 
 
