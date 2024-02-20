@@ -2,127 +2,160 @@
 <html lang="en">
 
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>BlazorNotes</title>
-    <base href="/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="BlazorNotes.styles.css" rel="stylesheet" />
+    <base href="/"/>
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/app.css"/>
+    <link rel="icon" type="image/png" href="favicon.png"/>
+    <link href="BlazorNotes.styles.css" rel="stylesheet"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@xz/fonts@1/serve/jetbrains-mono.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.1/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
-    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
-    <link href="_content/Blazored.Modal/blazored-modal.css" rel="stylesheet" />
-    <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet" />
-    
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet"/>
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet"/>
+    <link href="_content/Blazored.Modal/blazored-modal.css" rel="stylesheet"/>
+    <link href="_content/Blazored.Toast/blazored-toast.css" rel="stylesheet"/>
+
 </head>
 
 <body>
-    <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
-    </div>
+<div id="app">
+    <svg class="loading-progress">
+        <circle r="40%" cx="50%" cy="50%"/>
+        <circle r="40%" cx="50%" cy="50%"/>
+    </svg>
+    <div class="loading-progress-text"></div>
+</div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
-    <script src="_framework/blazor.webassembly.js"></script>
-    <script src="_content/Blazored.Modal/blazored-modal.js"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js";
-        
+<div id="blazor-error-ui">
+    An unhandled error has occurred.
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
+<script src="_framework/blazor.webassembly.js"></script>
+<script src="_content/Blazored.Modal/blazored-modal.js"></script>
+<script type="module">
+    import {initializeApp} from "https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js";
 
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDdrz5LgykDBpxBsRf9-C59PhJ0w1Weda0",
-            authDomain: "blazor-notes.firebaseapp.com",
-            projectId: "blazor-notes",
-            storageBucket: "blazor-notes.appspot.com",
-            messagingSenderId: "990579752301",
-            appId: "1:990579752301:web:8123dfd48a074616cbae64",
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyDdrz5LgykDBpxBsRf9-C59PhJ0w1Weda0",
+        authDomain: "blazor-notes.firebaseapp.com",
+        projectId: "blazor-notes",
+        storageBucket: "blazor-notes.appspot.com",
+        messagingSenderId: "990579752301",
+        appId: "1:990579752301:web:8123dfd48a074616cbae64",
+    };
 
-        // Inicialização do Firebase
-        const app = initializeApp(firebaseConfig);
+    // Inicialização do Firebase
+    const app = initializeApp(firebaseConfig);
 
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.0.0/firebase-auth.js";
 
-        window.signIn = async function (email, password) {
-            console.log('Iniciado');
-            const auth = getAuth(app);
-            try {
-                // Configura a persistência antes de fazer o login
-                await setPersistence(auth, browserLocalPersistence);
+    import {
+        getAuth,
+        signInWithEmailAndPassword,
+        createUserWithEmailAndPassword,
+        setPersistence,
+        browserLocalPersistence,
+        onAuthStateChanged,
+        signOut
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js";
+    import {
+        setDoc,
+        arrayUnion,
+        getDocs,
+        addDoc,
+        collection,
+        getDoc,
+        updateDoc,
+        doc,
+        getFirestore
+    } from "https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js";
 
-                // Tenta fazer o login
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log('Usuário logado com sucesso: ', userCredential.user);
-                return true; // Retorna true se o login for bem-sucedido
-            } catch (error) {
-                // Captura erros tanto de persistência quanto de login
-                console.error('Erro no login: ', error.code, error.message);
-                return false; // Retorna false se ocorrer um erro
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+
+    window.getAuthState = function () {
+        return new Promise((resolve, reject) => {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    console.log('Usuário logado: ', user);
+                    resolve(true);
+                } else {
+                    console.log('Usuário deslogado');
+                    resolve(false);
+                }
+            })
+        })
+    }
+
+    window.getUserUid = function () {
+        return new Promise((resolve, reject) => {
+            console.log(auth.currentUser)
+            if (auth.currentUser) {
+                resolve(auth.currentUser.uid);
+            } else {
+                resolve(null);
             }
+        })
+    }
+
+
+    window.signIn = async function (email, password) {
+
+        console.log('Iniciado');
+        try {
+            // Configura a persistência antes de fazer o login
+            await setPersistence(auth, browserLocalPersistence);
+
+            // Tenta fazer o login
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            var user = userCredential.user;
+            console.log('Usuário logado com sucesso: ', userCredential.user);
+            return true; // Retorna true se o login for bem-sucedido
+        } catch (error) {
+            // Captura erros tanto de persistência quanto de login
+            console.error('Erro no login: ', error.code, error.message);
+            return false; // Retorna false se ocorrer um erro
         }
+    }
 
 
-        window.signUp = async function (email, password) {
-            const auth = getAuth(app);
-            return createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
+    window.signUp = async function (email, password) {
+        return createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
 
-                    return true;
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    console.log(`Erro ao criar usuário: ${errorCode}, ${errorMessage}`);
+                return true;
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                console.log(`Erro ao criar usuário: ${errorCode}, ${errorMessage}`);
 
-                    return false;
-                });
-        }
-
-        window.authStateChanged = function () {
-            return new Promise((resolve, reject) => {
-                const auth = getAuth(app);
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        console.log('Usuário logado');
-                        resolve(true);
-                    } else {
-                        console.log('Usuário não logado');
-                        resolve(false);
-                    }
-                });
+                return false;
             });
+    }
+
+
+    window.signOut = async function () {
+        try {
+            await signOut(auth);
+            console.log('Usuário deslogado');
+            return true; // Retorna true se o logout for bem-sucedido
+        } catch (error) {
+            console.log('Erro ao deslogar usuário', error);
+            return false; // Retorna false em caso de erro
         }
-
-        window.signOut = async function () {
-            const auth = getAuth(app);
-            try {
-                await signOut(auth);
-                console.log('Usuário deslogado');
-                return true; // Retorna true se o logout for bem-sucedido
-            } catch (error) {
-                console.log('Erro ao deslogar usuário', error);
-                return false; // Retorna false em caso de erro
-            }
-        };
+    }
 
 
-        // Função de login
-    </script>
+    // Função de login
+</script>
 
 
- 
 </body>
 
 </html>

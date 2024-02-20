@@ -40,9 +40,11 @@
 @code
 {
     private LoginModel model = new LoginModel();
-
+    
     public async Task SubmitForm()
     {
+  
+    
         var result = await JSRuntime.InvokeAsync<bool>("signIn", model.Email, model.Password);
 
         if (result)
@@ -59,11 +61,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        bool isAuthenticated = await JSRuntime.InvokeAsync<bool>("authStateChanged");
+
+        bool isAuthenticated = await JSRuntime.InvokeAsync<bool>("getAuthState");
 
         if (isAuthenticated)
         {
-            NavigationManager.NavigateTo("/", true);
+            NavigationManager.NavigateTo("/");
         }
 
     }

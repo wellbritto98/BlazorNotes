@@ -7,26 +7,29 @@
 @inject Blazored.LocalStorage.ILocalStorageService localStorage
 @inject IToastService toastService
 @using Models.Home
+@inject NavigationManager _navigation
+@using System.Linq
+@inject IJSRuntime JSRuntime
 
 
 <EditForm Model="@model">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+    <DataAnnotationsValidator/>
+    <ValidationSummary/>
     <div class="form-card-add">
         <label for="title-input">
             Título:
         </label>
-        <InputTextCustom @bind-Value="@model.Title" id="title-input" />
+        <InputTextCustom @bind-Value="@model.Title" id="title-input"/>
 
         <label for="subhead-input">
             Subtítulo:
         </label>
-        <InputTextCustom @bind-Value="@model.Subhead" id="subhead-input" />
+        <InputTextCustom @bind-Value="@model.Subhead" id="subhead-input"/>
 
         <label for="content-input">
             Conteúdo:
         </label>
-        <TextAreaCustom @bind-Value="@model.Content" id="content-input" />
+        <TextAreaCustom @bind-Value="@model.Content" id="content-input"/>
 
         <ButtonComponent @onclick="SubmitForm">Adicionar</ButtonComponent>
     </div>
@@ -35,103 +38,91 @@
 
 @code {
 
-
+    [Parameter]
+    public NoteList noteList { get; set; }
 
     private CardModel model = new CardModel();
-    [CascadingParameter] BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
     private async Task SubmitForm()
     {
         var authKey = "firebase:authUser:AIzaSyDdrz5LgykDBpxBsRf9-C59PhJ0w1Weda0:[DEFAULT]";
 
-        // Obter o valor JSON do localStorage
+
+    // Obter o valor JSON do localStorage
         var userDataJson = await localStorage.GetItemAsStringAsync(authKey);
 
-        // Verificar se userDataJson não é nulo ou vazio
+    // Verificar se userDataJson não é nulo ou vazio
         if (!string.IsNullOrEmpty(userDataJson))
         {
-            // Parsear o userDataJson para um JsonDocument
-            using var document = JsonDocument.Parse(userDataJson);
-            // Obter a raiz do documento
-            var root = document.RootElement;
-            // Tentar obter o valor do UID
-            if (root.TryGetProperty("uid", out var uidElement))
+            var userId = await JSRuntime.InvokeAsync<string>("getUserUid");
+
+    // Verificar se o userId não é nulo ou vazio
+            if (!string.IsNullOrEmpty(userId))
             {
-                var userId = uidElement.GetString();
+    // Restante do código para salvar a nota...
+                var baseUrl = "https://firestore.googleapis.com/v1";
+                var projectId = "blazor-notes";
+                var collectionName = "notes";
+                var documentName = "users";
+                var url = $"{baseUrl}/projects/{projectId}/databases/(default)/documents/{documentName}/{userId}/{collectionName}";
 
-                // Verificar se o userId não é nulo ou vazio
-                if (!string.IsNullOrEmpty(userId))
+                var card = new
                 {
-                    // Restante do código para salvar a nota...
-                    var baseUrl = "https://firestore.googleapis.com/v1";
-                    var projectId = "blazor-notes";
-                    var collectionName = "notes";
-                    var documentName = "users";
-                    var url = $"{baseUrl}/projects/{projectId}/databases/(default)/documents/{documentName}/{userId}/{collectionName}";
-
-                    var card = new
+                    fields = new
                     {
-                        fields = new
-                        {
-                            title = new { stringValue = model.Title },
-                            subhead = new { stringValue = model.Subhead },
-                            content = new { stringValue = model.Content }
-                        }
+                        title = new { stringValue = model.Title },
+                        subhead = new { stringValue = model.Subhead },
+                        content = new { stringValue = model.Content }
+                    }
+                };
+
+
+                var json = JsonSerializer.Serialize(card);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await Http.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseJson = await response.Content.ReadAsStringAsync();
+                    var responseDocument = JsonDocument.Parse(responseJson);
+
+    // Desserializar a resposta para obter os detalhes da nota adicionada
+                    var newNote = new NoteModel
+                    {
+                        NoteId = responseDocument.RootElement.GetProperty("name").GetString().Split('/').Last(),
+                        Title = model.Title,
+                        Subhead = model.Subhead,
+                        Content = model.Content
                     };
 
-                    var json = JsonSerializer.Serialize(card);
-                    var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                    var response = await Http.PostAsync(url, content);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var responseJson = await response.Content.ReadAsStringAsync();
-                        var responseDocument = JsonDocument.Parse(responseJson);
-
-                        // Desserializar a resposta para obter os detalhes da nota adicionada
-                        var newNote = new NoteModel
-                            {
-                                NoteId = responseDocument.RootElement.GetProperty("name").GetString().Split('/').Last(),
-                                Title = model.Title,
-                                Subhead = model.Subhead,
-                                Content = model.Content
-                            };
-
-                        await localStorage.SetItemAsync("newNote", newNote);
+                    await localStorage.SetItemAsync("newNote", newNote);
 
 
-                        // Atualizar a renderização da página
-                       
+    // Atualizar a renderização da página
 
-                        toastService.ShowSuccess("Nota adicionada com sucesso.");
-                        await BlazoredModal.CloseAsync();
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Falha ao adicionar a nota. Status: {response.StatusCode}");
-                    }
+
+                    toastService.ShowSuccess("Nota adicionada com sucesso.");
+                    _navigation.NavigateTo("/");
                 }
                 else
                 {
-                    Console.WriteLine("UID do usuário não encontrado.");
+                    Console.WriteLine($"Falha ao adicionar a nota. Status: {response.StatusCode}");
                 }
             }
             else
             {
-                Console.WriteLine("Não foi possível encontrar a propriedade 'uid' nos dados do usuário.");
+                Console.WriteLine("UID do usuário não encontrado.");
             }
         }
         else
         {
-            Console.WriteLine("Dados do usuário não estão disponíveis no localStorage.");
+            Console.WriteLine("Não foi possível encontrar a propriedade 'uid' nos dados do usuário.");
         }
     }
-
-
-
-
-
-
 
     public class CardModel
     {
@@ -144,4 +135,9 @@
         [Required]
         public string Content { get; set; }
     }
+
+}
+
+
+
 }

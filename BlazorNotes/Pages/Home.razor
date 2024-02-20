@@ -13,16 +13,13 @@
 <div class="home-content">
     @if (noteList == null)
     {
-        <CustomSpinner />
+        <CustomSpinner/>
     }
     else if (noteList.Notes.Count > 0)
     {
-
-
-
         foreach (var note in noteList.Notes)
         {
-            <CardNote Title="@note.Title" SubTitle="@note.Subhead" Content="@note.Content" />
+            <CardNote Title="@note.Title" SubTitle="@note.Subhead" Content="@note.Content"/>
         }
     }
     else
@@ -31,11 +28,11 @@
             Poxa! Parece que não há nenhuma nota.🙁 Que tal adicionar sua primeira nota ? 😊
         </h5>
     }
-    <FloatingActionButton />
+    <FloatingActionButton/>
 </div>
 
 @code {
-    // Definindo noteList como uma propriedade da classe
+    [Parameter]
     public NoteList noteList { get; set; }
 
     public async Task GetNewNote()
@@ -52,25 +49,21 @@
             return;
         }
     }
-    protected async override Task OnAfterRenderAsync(bool firstRender)
-    {
-        await GetNewNote();
-        return;
-    }
-    protected override async Task OnInitializedAsync()
-    {
-        // subscribe to OnMessage event
 
-        var authKey = "firebase:authUser:AIzaSyDdrz5LgykDBpxBsRf9-C59PhJ0w1Weda0:[DEFAULT]";
-        var userDataJson = await localStorage.GetItemAsStringAsync(authKey);
+   
 
-        if (string.IsNullOrEmpty(userDataJson))
+    protected override async Task  OnInitializedAsync()
+    {
+        
+
+        var isAuthenticated = await JSRuntime.InvokeAsync<bool>("getAuthState");
+        if (!isAuthenticated)
         {
-            HandleError("Dados do usuário não estão disponíveis no localStorage.");
-            return;
+            NavigationManager.NavigateTo("/login");
         }
 
-        var userId = GetUserIdFromJson(userDataJson);
+        
+        var userId = await JSRuntime.InvokeAsync<string>("getUserUid");
         if (string.IsNullOrEmpty(userId))
         {
             HandleError("UID do usuário não encontrado.");
@@ -116,17 +109,16 @@
         var responseJson = await response.Content.ReadAsStringAsync();
         var rootObject = JsonConvert.DeserializeObject<RootObject>(responseJson);
         return rootObject.Documents.Select(d => new NoteModel
-            {
-                NoteId = d.Name.Split('/').Last(),
-                Title = d.Fields.Title.Value,
-                Subhead = d.Fields.Subhead.Value,
-                Content = d.Fields.Content.Value,
-                CreateTime = d.CreateTime,
-                UpdateTime = d.UpdateTime
-            }).ToList();
+        {
+            NoteId = d.Name.Split('/').Last(),
+            Title = d.Fields.Title.Value,
+            Subhead = d.Fields.Subhead.Value,
+            Content = d.Fields.Content.Value,
+            CreateTime = d.CreateTime,
+            UpdateTime = d.UpdateTime
+        }).ToList();
     }
 
 
 
 }
-
