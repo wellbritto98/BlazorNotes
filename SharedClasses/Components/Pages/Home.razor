@@ -1,0 +1,119 @@
+﻿@page "/"
+@using Newtonsoft.Json
+@using System.Text.Json
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@inject IToastService toastService
+@inject ILocalStorageService localStorage
+@inject HttpClient Http
+@using Models.Home
+@using JsonSerializer = System.Text.Json.JsonSerializer
+@inject IModalService modal
+
+
+
+<PageTitle>BlazorNotes</PageTitle>
+<div class="home-content">
+    @if (noteList == null)
+    {
+        <CustomSpinner/>
+    }
+    else if (noteList.Notes.Count > 0)
+    {
+        foreach (var note in noteList.Notes)
+        {
+            <CardNote OnNoteRemoved="new EventCallback<NoteModel>(this, RemoveNote)" NoteId="@note.NoteId" Title="@note.Title" SubTitle="@note.Subhead" Content="@note.Content"/>
+        }
+    }
+    else
+    {
+        <h5>
+            Poxa! Parece que não há nenhuma nota.🙁 Que tal adicionar sua primeira nota ? 😊
+        </h5>
+    }
+    <FloatingActionButton OnClick="ParentFunction"/>
+</div>
+
+@code {
+
+    public NoteList noteList { get; set; }
+
+
+    private void ParentFunction()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add("OnNoteAdded", new EventCallback<NoteModel>(this, AddNote));
+        modal.Show<AddCardModal>(title: "Addcard", parameters: parameters);
+    }
+
+    private void AddNote(NoteModel newNote)
+    {
+        noteList.Notes.Add(newNote);
+        StateHasChanged();
+    }
+
+    private void RemoveNote(NoteModel note)
+    {
+        var foundNote = noteList.Notes.FirstOrDefault(n => n.NoteId == note.NoteId);
+        var items = noteList.Notes.Count();
+        noteList.Notes.Remove(foundNote);
+        noteList.Notes.Count();
+        StateHasChanged();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var isAuthenticated = await JSRuntime.InvokeAsync<bool>("getAuthState");
+        if (!isAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+
+
+        var userId = await JSRuntime.InvokeAsync<string>("getUserUid");
+        if (string.IsNullOrEmpty(userId))
+        {
+            System.Console.WriteLine("UID do usuário não encontrado.");
+            return;
+        }
+
+        var notes = await RetrieveNotes(userId);
+        if (notes == null)
+        {
+            return; 
+        }
+
+        noteList = new NoteList { Notes = notes };
+    }
+    
+
+
+    private async Task<List<NoteModel>> RetrieveNotes(string userId)
+    {
+        var notesJson = await JSRuntime.InvokeAsync<JsonElement>("getNotes");
+
+        var notes = notesJson.EnumerateArray().Select(n => new NoteModel
+        {
+            NoteId = n.GetProperty("id").GetString(),
+            Title = n.GetProperty("title").GetString(),
+            Subhead = n.GetProperty("subhead").GetString(),
+            Content = n.GetProperty("content").GetString(),
+        }).ToList();
+
+        if (notes == null)
+        {
+            toastService.ShowError("Não foi possível carregar as notas.");
+            return null;
+        }
+        else
+        {
+            return notes; 
+        }
+   
+        
+    }
+
+
+
+
+}

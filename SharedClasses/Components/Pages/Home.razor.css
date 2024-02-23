@@ -1,0 +1,6 @@
+﻿.home-content {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 50px;
+    gap: 20px; /* Define o espaço entre os cards */
+}

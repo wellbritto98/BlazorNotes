@@ -5,6 +5,8 @@ VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorNotes", "BlazorNotes\BlazorNotes.csproj", "{37093203-8890-4192-A990-77BEA838EE2D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebComponents", "WebComponents\WebComponents.csproj", "{1BEB6BCB-2CD5-46A4-A4F1-8DB6AFB64F4B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,8 +17,15 @@ Global
 		{37093203-8890-4192-A990-77BEA838EE2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37093203-8890-4192-A990-77BEA838EE2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37093203-8890-4192-A990-77BEA838EE2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1BEB6BCB-2CD5-46A4-A4F1-8DB6AFB64F4B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BEB6BCB-2CD5-46A4-A4F1-8DB6AFB64F4B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BEB6BCB-2CD5-46A4-A4F1-8DB6AFB64F4B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BEB6BCB-2CD5-46A4-A4F1-8DB6AFB64F4B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A16D36E4-8D6B-41DC-BA77-6C54AB767A3D}
 	EndGlobalSection
 EndGlobal
