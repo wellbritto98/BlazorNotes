@@ -1,0 +1,67 @@
+﻿@using Models.Models.Home
+@using WebComponents.Components.Modal
+@using Blazored.Modal
+@using Blazored.Modal.Services
+@inject IModalService modalService
+
+<div class="container-card">
+    <div class="content-card">
+        <div class="headline-and-subhead">
+            <div style="display: none">@NoteId</div>
+            <div class="headline">@Title</div>
+            <div class="subhead">@SubTitle</div>
+        </div>
+        <div class="content-text">@Content</div>
+        <div class="buttons">
+            <ButtonComponent @onclick="AbrirNota" >Abrir nota</ButtonComponent>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<NoteModel> OnNoteRemoved { get; set; }
+    [Parameter] public string NoteId { get; set; }
+    [Parameter] public string Title { get; set; }
+    [Parameter] public string SubTitle { get; set; }
+    [Parameter] public string Content { get; set; }
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+    public void AbrirNota()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add("NoteId", NoteId);
+        parameters.Add("Title", Title);
+        parameters.Add("Subhead", SubTitle);
+        parameters.Add("Content", Content);
+        parameters.Add("OnNoteEdited", new EventCallback<NoteModel>(this, UpdateNote));
+        parameters.Add("OnNoteRemoved", new EventCallback<NoteModel>(this, RemoveNote));
+        modalService.Show<Note>("Nota", parameters);
+    }
+
+    
+    private void UpdateNote(NoteModel updatedNote)
+    {
+        
+        this.Title = updatedNote.Title;
+        this.SubTitle = updatedNote.Subhead;
+        this.Content = updatedNote.Content;
+        StateHasChanged();
+    }
+    
+    private void RemoveNote()
+    {
+        var removedNote = new NoteModel
+        {
+            NoteId = NoteId,
+            Title = Title,
+            Subhead = SubTitle,
+            Content = Content
+        };
+        
+        OnNoteRemoved.InvokeAsync(removedNote);
+
+    }
+
+}
+

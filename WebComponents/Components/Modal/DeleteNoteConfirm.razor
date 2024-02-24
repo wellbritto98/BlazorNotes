@@ -1,0 +1,64 @@
+﻿@page "/DeleteNoteConfirm"
+@inject IJSRuntime JSRuntime
+@inject IToastService ToastService
+
+<h5>Você tem certeza que deseja deletar esta nota ?</h5>
+<br/>
+<div class="action-buttons">
+    <button class="confirm-delete" style="
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;"
+            @onclick="ConfirmDelete">
+        Sim
+    </button>
+    
+    
+    <button class="cancel-delete"
+            style="    background-color: #6c757d;
+                       color: white;
+                       border: none;
+                       padding: 10px 20px;
+                       border-radius: 4px;"
+            @onclick="CancelDelete">
+        Não
+    </button>
+</div>
+
+
+@code {
+    
+    [Parameter]
+    public EventCallback OnNoteRemoved { get; set; }
+    [Parameter]
+    public string NoteId { get; set; }
+
+
+    [CascadingParameter]
+    BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    public async void ConfirmDelete()
+    {
+        bool success = await JSRuntime.InvokeAsync<bool>("removeNote", NoteId);
+        if (success)
+        {
+            await BlazoredModal.CloseAsync();
+            await OnNoteRemoved.InvokeAsync();
+        }
+        else
+        {
+            ToastService.ShowError("Erro ao deletar nota");
+            await BlazoredModal.CloseAsync();
+        }
+
+    }
+
+    public  void CancelDelete()
+    {
+        ToastService.ShowInfo("Operação cancelada");
+        BlazoredModal.CloseAsync();
+    }
+
+}

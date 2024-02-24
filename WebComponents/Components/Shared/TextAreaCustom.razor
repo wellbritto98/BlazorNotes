@@ -1,0 +1,13 @@
+﻿@inherits Microsoft.AspNetCore.Components.Forms.InputBase<string>
+
+<textarea @attributes="AdditionalAttributes" class="textarea-custom" @bind="CurrentValue" />
+
+@code {
+    // You can add additional logic here
+    protected override bool TryParseValueFromString(string? value, out string result, out string? validationErrorMessage)
+    {
+        result = value;
+        validationErrorMessage = null;
+        return true;
+    }
+}

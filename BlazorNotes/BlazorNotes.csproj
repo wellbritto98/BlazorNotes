@@ -19,7 +19,27 @@
     </ItemGroup>
 
     <ItemGroup>
-      <_ContentIncludedByDefault Remove="Components\ButtonComponent.razor" />
+      <ProjectReference Include="..\WebComponents\WebComponents.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Components\Modal\AddCardModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\Modal\DeleteNoteConfirm.razor" />
+      <_ContentIncludedByDefault Remove="Components\Modal\Note.razor" />
+      <_ContentIncludedByDefault Remove="Components\Modal\RegisterModal.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Home.razor" />
+      <_ContentIncludedByDefault Remove="Components\Pages\Login.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\AppBar.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\ButtonComponent.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\CardNote.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\CustomSpinner.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\FloatingActionButton.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\InputTextCustom.razor" />
+      <_ContentIncludedByDefault Remove="Components\Shared\TextAreaCustom.razor" />
+      <_ContentIncludedByDefault Remove="Layout\MainLayout.razor" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\app.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css.map" />
     </ItemGroup>
 
 </Project>

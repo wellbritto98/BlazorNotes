@@ -1,0 +1,23 @@
+﻿@using Models.Models.Home
+@using Blazored.Modal.Services
+@inject IModalService modalService
+
+
+<button id="fab-add" @onclick="ShowModal" class="fab-button">
+    <i class="fas fa-plus"></i>
+</button>
+
+
+
+@code {
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    private async Task ShowModal()
+    {
+        if (OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+}
