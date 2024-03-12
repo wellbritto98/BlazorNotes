@@ -1,6 +1,15 @@
-﻿.home-content {
+﻿.main-content{
     display: flex;
-    flex-wrap: wrap;
-    padding: 50px;
-    gap: 20px; /* Define o espaço entre os cards */
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    text-align: center;
+}
+.presentation{
+    width: 50%;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 0 10px 0 #ccc;
+    background-color: #fff;
 }

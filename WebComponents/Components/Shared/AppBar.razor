@@ -8,20 +8,73 @@
 <header class="app-bar">
     <nav>
         <span>
-            <ButtonComponent @onclick="GoToHomePage">BlazorNotes</ButtonComponent>
+            <ButtonComponent @onclick="GoToBlazorNotes">BlazorNotes</ButtonComponent>
         </span>
         <span>
-            <ButtonComponent @onclick="SignOut">Sair</ButtonComponent>
+            <ButtonComponent @onclick="GoToCalcPed" > CalcPed</ButtonComponent>
         </span>
+
+        <span>
+            <ButtonComponent @onclick="@FunctionHandler">@logoutName</ButtonComponent>
+        </span>
+
+
     </nav>
 </header>
 
 @code {
+    private string currentUrl { get; set; }
 
-    public void GoToHomePage(MouseEventArgs e)
+    [Parameter]
+    public string logoutName { get; set; }
+
+
+    protected override void OnInitialized()
     {
-        NavigationManager.NavigateTo("/");
+        currentUrl = NavigationManager.Uri;
+        UpdateLogoutName();
+        NavigationManager.LocationChanged += HandleLocationChanged;
     }
+
+    private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    {
+        currentUrl = e.Location;
+        UpdateLogoutName();
+        StateHasChanged();
+    }
+
+    private void UpdateLogoutName()
+    {
+        if (currentUrl.Contains("/login"))
+        {
+            this.logoutName = "😁";
+        }
+        else
+        {
+            this.logoutName = "Sair";
+        }
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= HandleLocationChanged;
+    }
+
+    public void GoToBlazorNotes(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo("/blazornotes");
+    }
+    
+    public void GoToCalcPed(MouseEventArgs e)
+    {
+        NavigationManager.NavigateTo("/calcped");
+    }
+
+    public async Task Welcome(MouseEventArgs e)
+    {
+        toastService.ShowSuccess("Seja bem vindo ! Obrigado por usar o BlazorTools");
+    }
+
 
     public async Task SignOut(MouseEventArgs e)
     {
@@ -35,7 +88,18 @@
         {
             toastService.ShowError("Erro ao deslogar !");
         }
-
+    }
+    
+    public void FunctionHandler(MouseEventArgs e)
+    {
+        if (currentUrl.Contains("/login"))
+        {
+            Welcome(e);
+        }
+        else
+        {
+            SignOut(e);
+        }
     }
 
 }

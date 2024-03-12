@@ -1,0 +1,20 @@
+﻿@page "/calcped"
+@using System.ComponentModel.DataAnnotations
+<main class="main-calcped">
+    <section class="calc-medicine">
+        <label>Peso da criança(kg)</label>
+        <InputTextCustom type="number" placeholder="kg" id="teste"> </InputTextCustom>
+    </section>
+</main>
+
+
+
+@code {
+    
+    public class Crianca
+    {
+        [Required]
+        public double? Peso { get; set; }
+
+    }
+}

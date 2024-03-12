@@ -37,12 +37,61 @@
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'tizen'">6.5</SupportedOSPlatformVersion>
+        <GenerateAppInstallerFile>True</GenerateAppInstallerFile>
+        <AppxPackageSigningEnabled>False</AppxPackageSigningEnabled>
+        <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
+        <AppxAutoIncrementPackageRevision>True</AppxAutoIncrementPackageRevision>
+        <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
+        <GenerateTestArtifacts>True</GenerateTestArtifacts>
+        <AppInstallerUri>D:\Projetos\Particular\ASPNet\Blazor\BlazorNotes\BlazorNotesApp</AppInstallerUri>
+        <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
+        <AndroidSigningKeyStore>blazornote.keystore</AndroidSigningKeyStore>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
+      <AndroidPackageFormat>apk</AndroidPackageFormat>
+      <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+      <AndroidKeyStore>True</AndroidKeyStore>
+      <AndroidSigningKeyAlias>blazornote</AndroidSigningKeyAlias>
+      <AndroidSigningKeyPass>jovemfla1</AndroidSigningKeyPass>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
+      <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+      <AndroidKeyStore>True</AndroidKeyStore>
+      <AndroidSigningKeyAlias>blazornote</AndroidSigningKeyAlias>
+      <AndroidSigningKeyPass>jovemfla1</AndroidSigningKeyPass>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
+      <ApplicationId>com.wellingtonbritto.blazornotesapp</ApplicationId>
     </PropertyGroup>
 
     <ItemGroup>
         <!-- App Icon -->
-        <MauiIcon Include="Resources\AppIcon\blazornotesicon.svg" />
-        <!--<MauiIcon Include="Resources\raw\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />-->
+        <MauiIcon Include="Resources\AppIcon\appicon.svg" />
 
         <!-- Splash Screen -->
         <MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#512BD4" BaseSize="128,128" />
@@ -59,7 +108,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="Resources\AppIcon\blazornotesicon.svg" />
+      <None Remove="Resources\AppIcon\appicon - Cópia.svg" />      <None Remove="Resources\AppIcon\appicon.svg" />
+      <None Remove="Resources\AppIcon\appiconfg.svg" />
     </ItemGroup>
 
     <ItemGroup>
